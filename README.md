@@ -32,4 +32,5 @@ The main features of the application are:
 
 # Authors
  - João Vitor Ramos de Souza Silva
+
 Please follow github and join us! Thanks to visiting me and good coding!
