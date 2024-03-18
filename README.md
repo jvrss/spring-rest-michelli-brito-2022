@@ -8,7 +8,7 @@ https://www.youtube.com/watch?v=LXRU-Z36GEU
 
 # Technology
 Here are the technologies used in this project.
- - Java 17
+ - Java 21
  - Spring Web
  - Spring JPA
  - Spring Validation
