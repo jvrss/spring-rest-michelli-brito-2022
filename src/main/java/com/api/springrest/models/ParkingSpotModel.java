@@ -2,7 +2,7 @@ package com.api.springrest.models;
 
 import lombok.Data;
 
-import jakarta.persistence.*;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.UUID;

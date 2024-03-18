@@ -15,9 +15,9 @@ public class SpringRestApplication {
     }
 
     @GetMapping
-    @Operation(summary = "Returns Hello World")
+    @Operation(summary = "Retorna Hello World")
     public String index(){
-        return "Hello World!";
+        return "Ola Mundo!";
     }
 
 }
