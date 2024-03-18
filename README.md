@@ -13,7 +13,7 @@ Here are the technologies used in this project.
  - Spring JPA
  - Spring Validation
  - Lombok
- - Postgres
+ - Mysql
  - Swagger
 
 # Services Used
