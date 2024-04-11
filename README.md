@@ -31,18 +31,18 @@ Here are the technologies used in this project.
  - To run the container:
 > docker run --name parking_control \
 -p 32000:8080 \
--e DB_SERVER=<ip-dabatabase> \
+-e DB_SERVER= \
 -e DB_PORT=3306 \
--e DB_NAME=<db-name> \
--e DB_USERNAME=<db-username> \
--e DB_PASSWORD=<db-password> \
+-e DB_NAME= \
+-e DB_USERNAME= \
+-e DB_PASSWORD= \
 -d soldierjvx/parking_control_db:latest
 
 Where:
- - <ip-dabatabase>: IP from MYSQL server
- - <db-name>: Name of database in MYSQL
- - <db-username>: Database username
- - <db-password>: Database password
+ - DB_SERVER: IP from MYSQL server
+ - DB_NAME: Name of database in MYSQL
+ - DB_USERNAME: Database username
+ - DB_PASSWORD: Database password
 
 # How to use
 Through the web interface, manage parking lots such as:
