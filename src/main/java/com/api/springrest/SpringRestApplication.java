@@ -11,7 +11,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class SpringRestApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(SpringRestApplication.class, args);
+        SpringApplication application = new SpringApplication(SpringRestApplication.class);
+        application.setAdditionalProfiles("ssl");
+        application.run(args);
     }
 
     @GetMapping

@@ -1,8 +1,7 @@
 # Spring Rest Michelli Brito 2022
 This application is a Java REST backend for a parking control system. Parking CRUD
 - API
-   - http://jvrss.tplinkdns.com:32000/swagger-ui/index.html
-     (The Page only works in http. If the Page not load, switch to http)
+   - https://jvrss.tplinkdns.com:32000/swagger-ui/index.html
 
 ![image link](http://i3.ytimg.com/vi/LXRU-Z36GEU/hqdefault.jpg)
 
@@ -37,6 +36,9 @@ Here are the technologies used in this project.
 -e DB_NAME= \
 -e DB_USERNAME= \
 -e DB_PASSWORD= \
+-e KEY_STORE_NAME= \
+-e KEY_STORE_PASSWORD= \
+-e KEY_STORE_ALIAS= \
 -d soldierjvx/parking_control_db:latest
 
 Where:
@@ -44,6 +46,9 @@ Where:
  - DB_NAME: Name of database in MYSQL
  - DB_USERNAME: Database username
  - DB_PASSWORD: Database password
+ - KEY_STORE_NAME: Name of Key Store File
+ - KEY_STORE_PASSWORD: Password Keystore
+ - KEY_STORE_ALIAS: Alias Key Store
 
 # How to use
 Through the web interface, manage parking lots such as:
@@ -55,9 +60,7 @@ Through the web interface, manage parking lots such as:
 
 # Links
  - API
-   - http://jvrss.tplinkdns.com:32000/swagger-ui/index.html
-
-     (The Page only works in http. If the Page not load, switch to http)
+   - https://jvrss.tplinkdns.com:32000/swagger-ui/index.html
  - Repository
    - https://github.com/jvrss/spring-rest-michelli-brito-2022
      - In case of sensitive bugs like security vulnerabilities, please contact me directly instead of using issue tracker. We value your effort to improve the security and privacy of this project!
