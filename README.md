@@ -36,9 +36,8 @@ Here are the technologies used in this project.
 -e DB_NAME= \
 -e DB_USERNAME= \
 -e DB_PASSWORD= \
--e KEY_STORE_NAME= \
--e KEY_STORE_PASSWORD= \
--e KEY_STORE_ALIAS= \
+-e FILE_CERTIFICATE= \
+-e FILE_PRIVATE_KEY= \
 -d soldierjvx/parking_control_db:latest
 
 Where:
@@ -46,9 +45,8 @@ Where:
  - DB_NAME: Name of database in MYSQL
  - DB_USERNAME: Database username
  - DB_PASSWORD: Database password
- - KEY_STORE_NAME: Name of Key Store File
- - KEY_STORE_PASSWORD: Password Keystore
- - KEY_STORE_ALIAS: Alias Key Store
+ - FILE_CERTIFICATE: Certificate
+ - FILE_PRIVATE_KEY: Private Key
 
 # How to use
 Through the web interface, manage parking lots such as:
