@@ -5,7 +5,7 @@ target/
 !**/src/test/**/target/
 
 ### KEYS ###
-*.p12
+*.pem
 
 ### STS ###
 .apt_generated
