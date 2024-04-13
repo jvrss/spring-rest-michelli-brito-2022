@@ -1,7 +1,7 @@
 # Spring Rest Michelli Brito 2022
 This application is a Java REST backend for a parking control system. Parking CRUD
 - API
-   - https://jvrss.tplinkdns.com:32000/swagger-ui/index.html \
+   - https://jvrss.com.br:32000/swagger-ui/index.html \
      (Ignore the certificate error)
 
 ![image link](http://i3.ytimg.com/vi/LXRU-Z36GEU/hqdefault.jpg)
@@ -61,7 +61,7 @@ Through the web interface, manage parking lots such as:
 
 # Links
  - API
-   - https://jvrss.tplinkdns.com:32000/swagger-ui/index.html \
+   - https://jvrss.com.br:32000/swagger-ui/index.html \
      (Ignore the certificate error)
  - Repository
    - https://github.com/jvrss/spring-rest-michelli-brito-2022
