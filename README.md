@@ -30,6 +30,8 @@ Here are the technologies used in this project.
    -t soldierjvx/parking_control_db .
  - To run the container:
 > docker run --name parking_control \
+--mount type=bind,source=/etc/letsencrypt/live/jvrss.com.br/fullchain.pem,target=/certificate/fullchain.pem,readonly \
+--mount type=bind,source=/etc/letsencrypt/live/jvrss.com.br/privkey.pem,target=/certificate/privkey.pem,readonly \
 -p 32000:8080 \
 -e DB_SERVER= \
 -e DB_PORT=3306 \
@@ -41,12 +43,14 @@ Here are the technologies used in this project.
 -d soldierjvx/parking_control_db:latest
 
 Where:
+ - First Mount: Mounting the live certificate
+ - Second Mount: Mounting the private key
  - DB_SERVER: IP from MYSQL server
  - DB_NAME: Name of database in MYSQL
  - DB_USERNAME: Database username
  - DB_PASSWORD: Database password
- - FILE_CERTIFICATE: Certificate
- - FILE_PRIVATE_KEY: Private Key
+ - FILE_CERTIFICATE: Certificate (Same as First Mount)
+ - FILE_PRIVATE_KEY: Private Key (Same as Second Mount)
 
 # How to use
 Through the web interface, manage parking lots such as:
@@ -72,7 +76,7 @@ The main features of the application are:
  - Update Parking Spot
 
 # Versioning
-1.1.2
+1.1.3
 
 # Authors
  - João Vitor Ramos de Souza Silva
