@@ -14,7 +14,7 @@ public class CorsConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins("https://parking-control.jvrss.com.br/swagger-ui/index.html") // Replace with your allowed origin
+                        .allowedOrigins("https://parking-control.jvrss.com.br/swagger-ui/index.html", "https://jvrss.com.br") // Replace with your allowed origin
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*")
                         .allowCredentials(true);
