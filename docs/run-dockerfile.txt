@@ -1,0 +1,1 @@
+docker build -t soldierjvx/parking_control_db .
