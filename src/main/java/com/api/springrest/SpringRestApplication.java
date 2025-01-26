@@ -17,9 +17,9 @@ public class SpringRestApplication {
     }
 
     @GetMapping
-    @Operation(summary = "Returns Github page as iframe")
-    public String index() {
-        return "<iframe src=\"https://github.com/jvrss/spring-rest-michelli-brito-2022\" width=\"100%\" height=\"100%\"></iframe>";
+    @Operation(summary = "Returns Hello World")
+    public String index(){
+        return "Hello World!";
     }
 
 }
