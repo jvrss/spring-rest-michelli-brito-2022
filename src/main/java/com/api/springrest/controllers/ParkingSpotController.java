@@ -27,7 +27,7 @@ import java.util.UUID;
         info = @Info(
                 title = "API Parking Spot",
                 version = "1.1.5",
-                description = "Parking Spot API REST",
+                description = "Parking Spot API REST\n\nIf the endpoints are not working, use POSTMAN.",
                 contact = @Contact(
                         name = "João Silva",
                         email = "jv_rss@hotmail.com"
