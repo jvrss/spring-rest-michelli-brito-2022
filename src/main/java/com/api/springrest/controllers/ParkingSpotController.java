@@ -26,8 +26,8 @@ import java.util.UUID;
 @OpenAPIDefinition(
         info = @Info(
                 title = "API Parking Spot",
-                version = "1.1.4",
-                description = "API REST de Parking Spot",
+                version = "1.1.5",
+                description = "Parking Spot API REST",
                 contact = @Contact(
                         name = "João Silva",
                         email = "jv_rss@hotmail.com"
