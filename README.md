@@ -64,7 +64,7 @@ The main features of the application are:
  - Update Parking Spot
 
 # Versioning
-1.1.4
+1.1.5
 
 # Authors
  - João Vitor Ramos de Souza Silva
