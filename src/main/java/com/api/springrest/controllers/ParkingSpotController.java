@@ -40,7 +40,6 @@ import java.util.UUID;
 )
 @RestController
 @RequestMapping("/parking-spot")
-@CrossOrigin(origins = "*", maxAge = 3600)
 public class ParkingSpotController {
 
     private final ParkingSpotService parkingSpotService;
