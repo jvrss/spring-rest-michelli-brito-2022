@@ -23,6 +23,8 @@ Here are the technologies used in this project.
 # Getting started
  - Dependency
    - Docker
+- To build the application:
+> mvn clean package
  - To build the container:
 > sudo docker build \
    -t soldierjvx/parking_control_db .
