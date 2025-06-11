@@ -56,7 +56,8 @@ Through the web interface, manage parking lots such as:
  - Repository
    - https://github.com/jvrss/spring-rest-michelli-brito-2022
      - In case of sensitive bugs like security vulnerabilities, please contact me directly instead of using issue tracker. We value your effort to improve the security and privacy of this project!
-
+- Swagger
+    - http://localhost:32000/swagger-ui/index.html
 # Features
 The main features of the application are:
  - List All Parking Spots
