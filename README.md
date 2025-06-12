@@ -1,10 +1,10 @@
 # Spring Rest Michelli Brito 2022
 This application is a Java REST backend for a parking control system. Parking CRUD
 
-![image link](https://lh3.googleusercontent.com/pw/AP1GczOUtJWo5hJL_vyjjjdEFB16hN8yy4crXv1AW2RdUHrpvbA6kHBFWEiHdoHnOtB-2BBGNgnp_AgV0WZ6itdIGjH6zUhHPCfos8LXUry4JnAMYe6JQwakdMEBVJTVKYmEB8PQT9k43Gk2aOy32ZTuGVOE=w3084-h1977-s-no-gm)
+![image link](http://i3.ytimg.com/vi/LXRU-Z36GEU/hqdefault.jpg)
 
 Code developed in the video:\
-https://spring.io/projects/spring-ai
+https://www.youtube.com/watch?v=LXRU-Z36GEU
 
 # Technology
 Here are the technologies used in this project.
