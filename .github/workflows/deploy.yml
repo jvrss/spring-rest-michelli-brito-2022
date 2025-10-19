@@ -73,7 +73,7 @@ jobs:
     needs: docker
     environment:
       name: production
-      url: https://your-vps-domain.com
+      url: https://parking-control.jvrss.com.br/swagger-ui/index.html
 
     steps:
       - name: Deploy to VPS via SSH
