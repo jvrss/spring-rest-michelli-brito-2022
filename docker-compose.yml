@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   parking_control:
-    image: ${DOCKER_USERNAME}/parking_control_db:latest
+    image: parking_control_db:latest
     container_name: parking_control
     restart: unless-stopped
     ports:
