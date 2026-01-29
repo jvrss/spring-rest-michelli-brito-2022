@@ -1,4 +1,4 @@
-FROM openjdk:21-oracle
+FROM eclipse-temurin:21-jre
 
 ENV DB_SERVER=${DB_SERVER}
 ENV DB_PORT=${DB_PORT}
@@ -10,4 +10,5 @@ WORKDIR /opt
 ENV PORT 8080
 EXPOSE 8080
 COPY target/*.jar /opt/app.jar
-ENTRYPOINT exec java $JAVA_OPTS -jar app.jar
+# Use shell to allow JAVA_OPTS expansion; base image has sh
+ENTRYPOINT ["sh","-c","exec java $JAVA_OPTS -jar app.jar"]
