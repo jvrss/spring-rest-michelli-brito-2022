@@ -1,11 +1,11 @@
 package com.api.springrest.dtos;
 
-import lombok.Data;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
-@Data
+import java.util.Objects;
+
 public class ParkingSpotDto {
     @NotBlank
     private String parkingSpotNumber;
@@ -24,4 +24,108 @@ public class ParkingSpotDto {
     private String apartment;
     @NotBlank
     private String block;
+
+    public ParkingSpotDto() {
+    }
+
+    public ParkingSpotDto(String parkingSpotNumber, String licensePlateCar, String brandCar, String modelCar, String colorCar, String responsibleName, String apartment, String block) {
+        this.parkingSpotNumber = parkingSpotNumber;
+        this.licensePlateCar = licensePlateCar;
+        this.brandCar = brandCar;
+        this.modelCar = modelCar;
+        this.colorCar = colorCar;
+        this.responsibleName = responsibleName;
+        this.apartment = apartment;
+        this.block = block;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        ParkingSpotDto that = (ParkingSpotDto) o;
+        return Objects.equals(parkingSpotNumber, that.parkingSpotNumber) && Objects.equals(licensePlateCar, that.licensePlateCar) && Objects.equals(brandCar, that.brandCar) && Objects.equals(modelCar, that.modelCar) && Objects.equals(colorCar, that.colorCar) && Objects.equals(responsibleName, that.responsibleName) && Objects.equals(apartment, that.apartment) && Objects.equals(block, that.block);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(parkingSpotNumber, licensePlateCar, brandCar, modelCar, colorCar, responsibleName, apartment, block);
+    }
+
+    @Override
+    public String toString() {
+        return "ParkingSpotDto{" +
+                "parkingSpotNumber='" + parkingSpotNumber + '\'' +
+                ", licensePlateCar='" + licensePlateCar + '\'' +
+                ", brandCar='" + brandCar + '\'' +
+                ", modelCar='" + modelCar + '\'' +
+                ", colorCar='" + colorCar + '\'' +
+                ", responsibleName='" + responsibleName + '\'' +
+                ", apartment='" + apartment + '\'' +
+                ", block='" + block + '\'' +
+                '}';
+    }
+
+    public String getParkingSpotNumber() {
+        return parkingSpotNumber;
+    }
+
+    public void setParkingSpotNumber(String parkingSpotNumber) {
+        this.parkingSpotNumber = parkingSpotNumber;
+    }
+
+    public String getLicensePlateCar() {
+        return licensePlateCar;
+    }
+
+    public void setLicensePlateCar(String licensePlateCar) {
+        this.licensePlateCar = licensePlateCar;
+    }
+
+    public String getBrandCar() {
+        return brandCar;
+    }
+
+    public void setBrandCar(String brandCar) {
+        this.brandCar = brandCar;
+    }
+
+    public String getModelCar() {
+        return modelCar;
+    }
+
+    public void setModelCar(String modelCar) {
+        this.modelCar = modelCar;
+    }
+
+    public String getColorCar() {
+        return colorCar;
+    }
+
+    public void setColorCar(String colorCar) {
+        this.colorCar = colorCar;
+    }
+
+    public String getResponsibleName() {
+        return responsibleName;
+    }
+
+    public void setResponsibleName(String responsibleName) {
+        this.responsibleName = responsibleName;
+    }
+
+    public String getApartment() {
+        return apartment;
+    }
+
+    public void setApartment(String apartment) {
+        this.apartment = apartment;
+    }
+
+    public String getBlock() {
+        return block;
+    }
+
+    public void setBlock(String block) {
+        this.block = block;
+    }
 }

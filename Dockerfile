@@ -1,4 +1,4 @@
-FROM eclipse-temurin:21-jre
+FROM eclipse-temurin:25-jre
 
 ENV DB_SERVER=${DB_SERVER}
 ENV DB_PORT=${DB_PORT}
