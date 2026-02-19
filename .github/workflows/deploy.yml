@@ -52,6 +52,41 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Copy docker-compose.yml to VPS
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USERNAME }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_PORT }}
+          source: "docker-compose.yml"
+          target: "/opt/parking_control_db/"
+          overwrite: true
+          timeout: 60s
+          command_timeout: 30s
+
+      - name: Create environment file on VPS
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USERNAME }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_PORT }}
+          script: |
+            cd /opt/parking_control_db
+
+            # Create .env file with environment variables
+            cat > .env << EOF
+            DB_SERVER=${{ secrets.DB_SERVER }}
+            DB_PORT=${{ secrets.DB_PORT }}
+            DB_NAME=${{ secrets.DB_NAME }}
+            DB_USERNAME=${{ secrets.DB_USERNAME }}
+            DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+            KEY_STORE_PASSWORD=${{ secrets.KEY_STORE_PASSWORD }}
+            EOF
+
+            echo "✅ Environment file created successfully!"
+
       - name: Log in to GHCR
         run: echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u ${{ secrets.GHCR_USERNAME }} --password-stdin
 
