@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   parking_control:
-    image: parking_control_db:latest
+    image: ghcr.io/jvrss/parking_control_db:latest
     container_name: parking_control
     restart: unless-stopped
     ports:

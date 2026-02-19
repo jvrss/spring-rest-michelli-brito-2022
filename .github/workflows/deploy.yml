@@ -1,15 +1,18 @@
-name: Deploy to VPS
+name: Deploy to VPS (GHCR)
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
   workflow_dispatch:
 
 jobs:
-  build:
-    name: Build Application
+  build-and-push:
+    name: Build & Push Docker Image
     runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: write
 
     steps:
       - name: Checkout code
@@ -18,323 +21,53 @@ jobs:
       - name: Set up JDK 25
         uses: actions/setup-java@v4
         with:
-          java-version: '25'
-          distribution: 'temurin'
+          java-version: "25"
+          distribution: temurin
           cache: maven
 
-      - name: Build with Maven
+      - name: Build application
         run: mvn clean package -DskipTests
 
-      - name: Upload JAR artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: app-jar
-          path: target/*.jar
-          retention-days: 1
+      - name: Log in to GHCR
+        run: echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u ${{ secrets.GHCR_USERNAME }} --password-stdin
 
-  docker:
-    name: Build Docker Image
-    runs-on: ubuntu-latest
-    needs: build
+      - name: Build Docker image
+        run: |
+          docker build \
+            -t ghcr.io/jvrss/parking_control_db:latest \
+            -t ghcr.io/jvrss/parking_control_db:${{ github.sha }} \
+            .
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Download JAR artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: app-jar
-          path: target/
-
-      - name: Build Docker Image
-        run: docker build -t parking_control_db:latest .
-
-      - name: Save Docker Image
-        run: docker save parking_control_db:latest | gzip > parking_control_db.tar.gz
-
-      - name: Upload Docker Image artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: docker-image
-          path: parking_control_db.tar.gz
-          retention-days: 1
+      - name: Push Docker image
+        run: |
+          docker push ghcr.io/jvrss/parking_control_db:latest
+          docker push ghcr.io/jvrss/parking_control_db:${{ github.sha }}
 
   deploy:
-    name: Deploy to VPS
+    name: Deploy on VPS
     runs-on: self-hosted
-    needs: docker
-    environment:
-      name: production
-      url: https://parking-control.jvrss.com.br/swagger-ui/index.html
+    needs: build-and-push
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Download Docker Image artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: docker-image
+      - name: Log in to GHCR
+        run: echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u ${{ secrets.GHCR_USERNAME }} --password-stdin
 
-      - name: Test VPS Connection
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USERNAME }}
-          key: ${{ secrets.VPS_SSH_KEY }}
-          port: ${{ secrets.VPS_PORT }}
-          timeout: 60s
-          command_timeout: 30s
-          script: |
-            echo "Connection test successful!"
-            echo "Creating deployment directory..."
-            mkdir -p /opt/parking_control_db
-            echo "Directory ready."
-
-      - name: Copy Docker Image to VPS
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USERNAME }}
-          key: ${{ secrets.VPS_SSH_KEY }}
-          port: ${{ secrets.VPS_PORT }}
-          source: "parking_control_db.tar.gz"
-          target: "/opt/parking_control_db/"
-          overwrite: true
-          timeout: 300s
-          command_timeout: 600s
-
-      - name: Copy docker-compose.yml to VPS
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USERNAME }}
-          key: ${{ secrets.VPS_SSH_KEY }}
-          port: ${{ secrets.VPS_PORT }}
-          source: "docker-compose.yml"
-          target: "/opt/parking_control_db/"
-          overwrite: true
-          timeout: 60s
-          command_timeout: 30s
-
-      - name: Reorganize files on VPS
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USERNAME }}
-          key: ${{ secrets.VPS_SSH_KEY }}
-          port: ${{ secrets.VPS_PORT }}
-          script: |
-            cd /opt/parking_control_db
-            
-            echo "=== Before reorganization ==="
-            ls -laR
-            echo ""
-            
-            # Move files if they are in subdirectories (SCP creates nested dirs)
-            if [ -d parking_control_db.tar.gz ]; then
-              echo "Moving tar.gz from subdirectory..."
-              find parking_control_db.tar.gz -name "*.tar.gz" -type f -exec mv {} . \;
-              rm -rf parking_control_db.tar.gz/
-            fi
-            
-            if [ -d docker-compose.yml ]; then
-              echo "Moving docker-compose.yml from subdirectory..."
-              find docker-compose.yml -name "docker-compose.yml" -type f -exec mv {} . \;
-              rm -rf docker-compose.yml/
-            fi
-            
-            # Also check for any nested directories with these files
-            find . -name "docker-compose.yml" -type f ! -path "./docker-compose.yml" -exec mv {} . \;
-            find . -name "*.tar.gz" -type f ! -path "./parking_control_db.tar.gz" -exec mv {} . \;
-            
-            echo ""
-            echo "=== After reorganization ==="
-            ls -la
-            echo ""
-            
-            # Verify files are in the root
-            if [ ! -f docker-compose.yml ]; then
-              echo "❌ ERROR: docker-compose.yml still not found after reorganization!"
-              echo "Creating docker-compose.yml manually..."
-              echo "version: '3.8'" > docker-compose.yml
-              echo "" >> docker-compose.yml
-              echo "services:" >> docker-compose.yml
-              echo "  app:" >> docker-compose.yml
-              echo "    image: parking_control_db:latest" >> docker-compose.yml
-              echo "    container_name: parking_control_db" >> docker-compose.yml
-              echo "    restart: unless-stopped" >> docker-compose.yml
-              echo "    ports:" >> docker-compose.yml
-              echo "      - \"32000:8080\"" >> docker-compose.yml
-              echo "    environment:" >> docker-compose.yml
-              echo "      - DB_SERVER=\${DB_SERVER}" >> docker-compose.yml
-              echo "      - DB_PORT=\${DB_PORT}" >> docker-compose.yml
-              echo "      - DB_NAME=\${DB_NAME}" >> docker-compose.yml
-              echo "      - DB_USERNAME=\${DB_USERNAME}" >> docker-compose.yml
-              echo "      - DB_PASSWORD=\${DB_PASSWORD}" >> docker-compose.yml
-              echo "      - KEY_STORE_PASSWORD=\${KEY_STORE_PASSWORD}" >> docker-compose.yml
-              echo "✅ docker-compose.yml created"
-            else
-              echo "✅ docker-compose.yml is in correct location"
-            fi
-            
-            if [ ! -f parking_control_db.tar.gz ]; then
-              echo "❌ ERROR: parking_control_db.tar.gz not found!"
-            else
-              echo "✅ parking_control_db.tar.gz is in correct location"
-            fi
-
-      - name: Verify files on VPS
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USERNAME }}
-          key: ${{ secrets.VPS_SSH_KEY }}
-          port: ${{ secrets.VPS_PORT }}
-          script: |
-            cd /opt/parking_control_db
-            echo "=== Current directory ==="
-            pwd
-            echo ""
-            echo "=== All files and directories ==="
-            ls -laR
-            echo ""
-            echo "=== Checking for docker-compose.yml ==="
-            if [ -f docker-compose.yml ]; then
-              echo "✅ docker-compose.yml found in correct location"
-              echo "Content:"
-              cat docker-compose.yml
-            else
-              echo "❌ docker-compose.yml NOT in root directory"
-              echo "Searching for it..."
-              find . -name "docker-compose.yml" -type f
-            fi
-            echo ""
-            echo "=== Checking for tar.gz ==="
-            if [ -f parking_control_db.tar.gz ]; then
-              echo "✅ parking_control_db.tar.gz found"
-              ls -lh parking_control_db.tar.gz
-            else
-              echo "❌ parking_control_db.tar.gz NOT found"
-              find . -name "*.tar.gz" -type f
-            fi
-
-      - name: Create environment file on VPS
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USERNAME }}
-          key: ${{ secrets.VPS_SSH_KEY }}
-          port: ${{ secrets.VPS_PORT }}
-          script: |
-            cd /opt/parking_control_db
-            
-            # Create .env file with environment variables
-            cat > .env << EOF
-            DB_SERVER=${{ secrets.DB_SERVER }}
-            DB_PORT=${{ secrets.DB_PORT }}
-            DB_NAME=${{ secrets.DB_NAME }}
-            DB_USERNAME=${{ secrets.DB_USERNAME }}
-            DB_PASSWORD=${{ secrets.DB_PASSWORD }}
-            KEY_STORE_PASSWORD=${{ secrets.KEY_STORE_PASSWORD }}
-            EOF
-            
-            echo "✅ Environment file created successfully!"
-
-      - name: Load Docker Image
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USERNAME }}
-          key: ${{ secrets.VPS_SSH_KEY }}
-          port: ${{ secrets.VPS_PORT }}
-          script: |
-            cd /opt/parking_control_db
-            echo "Loading Docker image..."
-            docker load < parking_control_db.tar.gz
-            echo "Verifying image loaded:"
-            docker images | grep parking_control_db
+      - name: Pull latest image
+        run: docker pull ghcr.io/jvrss/parking_control_db:latest
 
       - name: Stop old containers
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USERNAME }}
-          key: ${{ secrets.VPS_SSH_KEY }}
-          port: ${{ secrets.VPS_PORT }}
-          script: |
-            cd /opt/parking_control_db
-            echo "Stopping old containers..."
-            docker-compose down || true
-            echo "Removing old container if exists..."
-            docker rm -f parking_control_db || true
+        run: |
+          cd /opt/parking_control_db
+          docker-compose down --remove-orphans || true
+          docker rm -f parking_control_db || true
 
-      - name: Start new containers
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USERNAME }}
-          key: ${{ secrets.VPS_SSH_KEY }}
-          port: ${{ secrets.VPS_PORT }}
-          script: |
-            cd /opt/parking_control_db
-            echo "Starting new containers..."
-            docker-compose up -d
-            echo "Waiting 10 seconds for container to start..."
-            sleep 10
-            echo "Container status:"
-            docker ps -a | grep parking_control || echo "Container not found!"
+      - name: Start new container
+        run: |
+          cd /opt/parking_control_db
+          docker-compose up -d
 
-      - name: Check container logs
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USERNAME }}
-          key: ${{ secrets.VPS_SSH_KEY }}
-          port: ${{ secrets.VPS_PORT }}
-          script: |
-            cd /opt/parking_control_db
-            echo "=== Container Logs (Last 100 lines) ==="
-            docker logs parking_control_db --tail=100 || echo "Failed to get logs"
-            echo ""
-            echo "=== Docker Compose Status ==="
-            docker-compose ps
-
-      - name: Cleanup
-        uses: appleboy/ssh-action@v1.0.3
-        if: always()
-        with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USERNAME }}
-          key: ${{ secrets.VPS_SSH_KEY }}
-          port: ${{ secrets.VPS_PORT }}
-          script: |
-            cd /opt/parking_control_db
-            rm -f parking_control_db.tar.gz
-            docker image prune -f
-            echo "Cleanup completed!"
-            
-      - name: Verify deployment
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USERNAME }}
-          key: ${{ secrets.VPS_SSH_KEY }}
-          port: ${{ secrets.VPS_PORT }}
-          script: |
-            cd /opt/parking_control_db
-            echo "=== Final Container Status ==="
-            docker ps | grep parking_control || echo "WARNING: Container is not running!"
-            echo ""
-            echo "=== All Containers ==="
-            docker ps -a
-            echo ""
-            if docker ps | grep -q parking_control; then
-              echo "✅ Deployment successful - Container is running!"
-              echo "Application should be accessible at http://147.79.104.154:32000"
-            else
-              echo "❌ Deployment failed - Container is not running!"
-              echo "Check logs above for errors"
-              exit 1
-            fi
+      - name: Verify container
+        run: docker ps | grep parking_control_db
