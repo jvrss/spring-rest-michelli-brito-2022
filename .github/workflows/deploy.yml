@@ -47,6 +47,9 @@ jobs:
     name: Deploy on VPS
     runs-on: self-hosted
     needs: build-and-push
+    environment:
+      name: production
+      url: https://parking-control.jvrss.com.br/swagger-ui/index.html
 
     steps:
       - name: Checkout code
